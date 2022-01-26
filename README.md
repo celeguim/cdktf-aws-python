@@ -53,3 +53,11 @@ cdktf-aws-python % cdktf get
 ⠦ downloading and generating modules and providers...
 
 ```
+
+## Do-it
+```
+$ cdktf apply
+$ cdktf destroy
+$ cdktf diff
+```
+
