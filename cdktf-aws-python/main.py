@@ -4,7 +4,7 @@ from cdktf import App, TerraformStack, TerraformOutput
 
 from imports.aws import AwsProvider
 from imports.aws.vpc import Vpc, RouteTable, Subnet, InternetGateway, RouteTableAssociation, Route, SecurityGroup, \
-    SecurityGroupIngress, NatGateway, SecurityGroupEgress
+    SecurityGroupIngress, NatGateway, SecurityGroupEgress, NetworkAcl, NetworkAclIngress, NetworkAclEgress
 from imports.aws.ec2 import Instance, Eip
 
 
@@ -43,6 +43,23 @@ class MyStack(TerraformStack):
         RouteTableAssociation(self, 'private_subnet_rta', subnet_id=private_subnet.id, route_table_id=private_route_table.id)
         Route(self, 'private_route', route_table_id=private_route_table.id, nat_gateway_id=nat_gateway.id,
               destination_cidr_block='0.0.0.0/0')
+
+        # Recomended NACL for public/private networks with NAT
+        # NACL Inbound / you should secure it better your 22 port
+        nacl_ing1 = NetworkAclIngress(rule_no=100, cidr_block='0.0.0.0/0', action='allow', protocol='tcp', from_port=80, to_port=80)
+        nacl_ing2 = NetworkAclIngress(rule_no=110, cidr_block='0.0.0.0/0', action='allow', protocol='tcp', from_port=443, to_port=443)
+        nacl_ing3 = NetworkAclIngress(rule_no=120, cidr_block='0.0.0.0/0', action='allow', protocol='tcp', from_port=22, to_port=22)
+        nacl_ing4 = NetworkAclIngress(rule_no=130, cidr_block='0.0.0.0/0', action='allow', protocol='tcp', from_port=1024, to_port=65535)
+        # NACL Outbound
+        nacl_egr1 = NetworkAclEgress(rule_no=100, cidr_block='0.0.0.0/0', action='allow', protocol='tcp', from_port=80, to_port=80)
+        nacl_egr2 = NetworkAclEgress(rule_no=110, cidr_block='0.0.0.0/0', action='allow', protocol='tcp', from_port=443, to_port=443)
+        nacl_egr3 = NetworkAclEgress(rule_no=120, cidr_block='0.0.0.0/0', action='allow', protocol='tcp', from_port=1024, to_port=65535)
+        nacl_egr4 = NetworkAclEgress(rule_no=130, cidr_block='10.0.1.0/24', action='allow', protocol='tcp', from_port=22, to_port=22)
+        # Custom NACL
+        nacl = NetworkAcl(self, "nacl", vpc_id=vpc.id, subnet_ids=[public_subnet.id, private_subnet.id],
+                          tags={"Name": "MyNetworkACL"})
+        nacl.ingress = [nacl_ing1, nacl_ing2, nacl_ing3, nacl_ing4]
+        nacl.egress = [nacl_egr1, nacl_egr2, nacl_egr3, nacl_egr4]
 
         # Public Security Group
         pub_sec_gr = SecurityGroup(self, "pub_sec_gr", description="Public Security Group", name="pub_sec_gr", vpc_id=vpc.id,
