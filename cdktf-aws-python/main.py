@@ -6,9 +6,10 @@ from imports.aws import AwsProvider
 from imports.aws.vpc import Vpc, RouteTable, Subnet, InternetGateway, RouteTableAssociation, Route, SecurityGroup, \
     SecurityGroupIngress, NatGateway, SecurityGroupEgress, NetworkAcl, NetworkAclIngress, NetworkAclEgress
 from imports.aws.ec2 import Instance, Eip
+from imports.aws.eks import EksCluster, EksClusterVpcConfig
 
 
-class MyStack(TerraformStack):
+class MyStackVPC(TerraformStack):
     def __init__(self, scope: Construct, ns: str):
         super().__init__(scope, ns)
 
@@ -102,7 +103,17 @@ class MyStack(TerraformStack):
         TerraformOutput(self, "private_ip", value=priv_instance.private_ip)
 
 
-app = App()
-MyStack(app, "cdktf-aws-python")
+class MyStackEKS(TerraformStack):
+    def __init__(self, scope: Construct, ns: str):
+        super().__init__(scope, ns)
 
+        # AWS Provider on North Virginia (us-east-1)
+        AwsProvider(self, "Aws", region="us-east-1")
+        EksClusterVpcConfig()
+        EksCluster(self, "my_eks", name="my_eks")
+
+
+app = App()
+# MyStackVPC(app, "cdktf-aws-python")
+MyStackEKS(app, "cdktf-aws-python")
 app.synth()
