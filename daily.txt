@@ -1,0 +1,42 @@
+26.01
+    SP12
+    - Secure Build Chain
+    - Inventory System update
+
+27.01
+    SP12
+    - Secure Build Chain
+    - Secure Build Chain KT session
+
+28.01
+    SP12
+        - EVA onboarding
+        - NPTA
+
+    Outbound: Package creation
+
+31.01
+    SP12
+        - NPTA
+
+    Outbound:
+        - Package creation (h6docs)
+        - Create demand
+
+01.02
+    SP12
+        - NPTA
+
+    Outbound:
+        - Package creation (h6docs)
+        - Create demand
+
+02.02
+    SP12:        - NPTA + Secure Build Chain
+    Outbound:    - Create demand
+
+03.02
+    SP12:  - GMS deployment
+           - Inventory adequation
+
+
